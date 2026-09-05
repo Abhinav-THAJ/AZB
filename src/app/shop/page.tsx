@@ -1,9 +1,7 @@
-import React from 'react';
-import ProductCard from '@/components/ui/ProductCard';
+'use client';
 
-export const metadata = {
-  title: 'Shop - AZB Store',
-};
+import React, { useState } from 'react';
+import ProductCard from '@/components/ui/ProductCard';
 
 // Mock products for the shop page
 const products = [
@@ -18,6 +16,8 @@ const products = [
 ];
 
 export default function ShopPage() {
+  const [showFilters, setShowFilters] = useState(false);
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-end mb-8 border-b pb-4 border-gray-200">
@@ -35,9 +35,22 @@ export default function ShopPage() {
         </div>
       </div>
       
-      <div className="flex gap-8">
+      <div className="flex md:flex-col gap-8">
+        {/* Mobile Filter Toggle */}
+        <div className="hidden md:block">
+          <button 
+            className="btn btn-outline w-full flex items-center justify-center gap-2"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+        </div>
+
         {/* Sidebar Filters */}
-        <div style={{ width: '250px', flexShrink: 0 }} className="hidden md:block">
+        <div style={{ width: '250px', flexShrink: 0 }} className={`md:w-full ${showFilters ? 'md:block' : 'md:hidden'}`}>
           <h3 className="font-bold mb-4">Categories</h3>
           <div className="flex flex-col gap-2 text-muted">
             <label className="flex items-center gap-2 cursor-pointer hover:text-gold transition-colors">

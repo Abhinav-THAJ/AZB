@@ -191,6 +191,7 @@ img {
   .md\:hidden { display: none !important; }
   .md\:flex { display: flex !important; }
   .md\:block { display: block !important; }
+  .md\:w-full { width: 100% !important; }
 }
 
 @media (max-width: 480px) {
