@@ -103,7 +103,7 @@ export default function Home() {
             <a href="#" className="font-medium hover:text-gold" style={{ borderBottom: '1px solid currentColor' }}>View All</a>
           </div>
           
-          <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6">
+          <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 gap-6">
             {deals.map((deal, idx) => (
               <ProductCard
                 key={idx}

@@ -12,34 +12,43 @@ const categories = [
 export default function Header() {
   const { items, isOpen: isCartOpen, setIsOpen: setIsCartOpen, removeItem, getCartTotal } = useCartStore();
   const [isShopHovered, setIsShopHovered] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const cartItemsCount = items.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = getCartTotal();
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const cartItemsCount = isMounted ? items.reduce((total, item) => total + item.quantity, 0) : 0;
+  const cartTotal = isMounted ? getCartTotal() : 0;
 
   return (
     <>
       <header style={{ borderBottom: '1px solid var(--color-border)', padding: 'var(--spacing-4) 0', position: 'sticky', top: 0, backgroundColor: 'var(--color-background)', zIndex: 40 }}>
         <div className="container flex justify-between items-center">
+          
+          {/* Logo on Left */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Link href="/">
-              <img src="/logo.png" alt="AZB Store" style={{ height: '80px', width: 'auto' }} />
+              <img src="/logo.png" alt="AZB Store" style={{ height: '64px', width: 'auto' }} />
             </Link>
           </div>
           
-          <nav style={{ display: 'flex', gap: 'var(--spacing-6)', fontWeight: 500, position: 'relative' }}>
+          {/* Desktop Navigation (Center/Left) */}
+          <nav className="md:hidden" style={{ display: 'flex', gap: 'var(--spacing-6)', fontWeight: 500, position: 'relative' }}>
             <Link href="/" className="hover:text-gold transition-colors">Home</Link>
             
             <div 
               onMouseEnter={() => setIsShopHovered(true)}
               onMouseLeave={() => setIsShopHovered(false)}
-              style={{ paddingBottom: '1rem', marginBottom: '-1rem' }} // extended hit area
+              style={{ paddingBottom: '1rem', marginBottom: '-1rem' }}
             >
               <Link href="/shop" className="hover:text-gold transition-colors" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 Shop
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </Link>
               
-              {/* Mega Menu */}
+              {/* Mega Menu (Desktop Only) */}
               {isShopHovered && (
                 <div style={{
                   position: 'absolute',
@@ -79,21 +88,102 @@ export default function Header() {
             <Link href="/contact" className="hover:text-gold transition-colors">Contact</Link>
           </nav>
 
-          <div>
+          {/* Right Side: Cart & Hamburger Menu */}
+          <div className="flex items-center gap-4">
+            
+            {/* Cart Button */}
             <button 
-              className="btn btn-primary" 
-              style={{ padding: '0.5rem 1rem' }}
               onClick={() => setIsCartOpen(true)}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0.5rem', cursor: 'pointer', color: 'var(--color-text-primary)' }}
+              aria-label="Open Cart"
             >
-              Cart ({cartItemsCount})
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              {cartItemsCount > 0 && (
+                <span style={{ 
+                  position: 'absolute', 
+                  top: '0', 
+                  right: '0', 
+                  backgroundColor: 'var(--color-gold)', 
+                  color: 'var(--color-black)', 
+                  fontSize: '0.75rem', 
+                  fontWeight: 'bold', 
+                  borderRadius: '9999px', 
+                  width: '18px', 
+                  height: '18px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  transform: 'translate(25%, -25%)'
+                }}>
+                  {cartItemsCount}
+                </span>
+              )}
             </button>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="hidden md:flex items-center justify-center" 
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open Mobile Menu"
+              style={{ padding: '0.5rem', cursor: 'pointer', color: 'var(--color-text-primary)' }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
           </div>
         </div>
       </header>
 
+      {/* Mobile Navigation Drawer */}
+      {isMobileMenuOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex' }}>
+          <div 
+            style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div style={{ position: 'relative', width: '80%', maxWidth: '300px', backgroundColor: 'var(--color-surface)', height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-lg)', animation: 'slideInLeft 0.3s ease-out' }}>
+            <div style={{ padding: 'var(--spacing-4) var(--spacing-6)', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <img src="/logo.png" alt="AZB Store" style={{ height: '40px', width: 'auto' }} />
+              <button onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '1.5rem', lineHeight: 1 }}>&times;</button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--spacing-6)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-6)' }}>
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold">Home</Link>
+              
+              <div>
+                <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold mb-4 block">Shop All</Link>
+                <div className="flex flex-col gap-3 pl-4 border-l-2 border-gray-200 ml-2">
+                  {categories.map((cat, idx) => (
+                    <Link 
+                      key={idx} 
+                      href={`/shop?category=${cat.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-muted hover:text-gold"
+                    >
+                      {cat}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              
+              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold">About Us</Link>
+              <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold">Contact</Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cart Drawer */}
       {isCartOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', justifyContent: 'flex-end' }}>
           <div 
             style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', cursor: 'pointer' }}
             onClick={() => setIsCartOpen(false)}
@@ -159,6 +249,10 @@ export default function Header() {
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes slideInRight {
           from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); }
           to { transform: translateX(0); }
         }
       `}} />
