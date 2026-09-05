@@ -1,6 +1,7 @@
 import React from 'react';
 import StoreImage from '@/components/ui/StoreImage';
 import AddToCartForm from './AddToCartForm';
+import ProductCard from '@/components/ui/ProductCard';
 import Link from 'next/link';
 
 // Mock data fetcher
