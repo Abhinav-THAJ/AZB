@@ -59,7 +59,7 @@ export default function Home() {
           <h2 className="section-title">Shop by Category</h2>
           <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-6 mt-8">
             {categories.map((cat, idx) => (
-              <Link href={`/shop?category=${cat.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} key={idx} style={{ display: 'block', group: 'true' }}>
+              <Link href={`/shop?category=${cat.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} key={idx} style={{ display: 'block' }} className="group">
                 <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginBottom: 'var(--spacing-3)' }}>
                   <StoreImage 
                     src={null} 
