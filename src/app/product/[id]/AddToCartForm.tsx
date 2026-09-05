@@ -48,22 +48,22 @@ export default function AddToCartForm({ product }: AddToCartFormProps) {
         <div style={{ display: 'flex', alignItems: 'center', width: 'fit-content', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
           <button 
             onClick={handleDecrease}
-            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color var(--transition-fast)' }}
+            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-primary)', transition: 'background-color var(--transition-fast)' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(128,128,128,0.1)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            -
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
           <div style={{ width: '3rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, borderLeft: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)' }}>
             {quantity}
           </div>
           <button 
             onClick={handleIncrease}
-            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color var(--transition-fast)' }}
+            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-primary)', transition: 'background-color var(--transition-fast)' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(128,128,128,0.1)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            +
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
         </div>
       </div>

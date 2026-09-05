@@ -126,6 +126,29 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
         </div>
       </div>
+
+      {/* Related Products Section */}
+      <div style={{ marginTop: '6rem' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', textAlign: 'center' }}>You May Also Like</h2>
+        <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 gap-6">
+          {[
+            { id: 102, name: 'Smart Fitness Watch', price: '₹2,499', originalPrice: '₹5,999', fallback: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop' },
+            { id: 103, name: 'Pro Camera Lens', price: '₹12,999', originalPrice: '₹15,999', fallback: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=600&auto=format&fit=crop' },
+            { id: 104, name: 'Leather Wallet', price: '₹999', originalPrice: '₹1,999', fallback: 'https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=600&auto=format&fit=crop' },
+            { id: 105, name: 'Mechanical Keyboard', price: '₹3,499', originalPrice: undefined, fallback: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=600&auto=format&fit=crop' },
+          ].map((p) => (
+            <ProductCard
+              key={p.id}
+              id={p.id}
+              name={p.name}
+              price={p.price}
+              originalPrice={p.originalPrice}
+              imageFallback={p.fallback}
+            />
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }
