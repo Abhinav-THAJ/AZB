@@ -2,19 +2,19 @@
 
 :root {
   /* AZB Store Brand Colors */
-  --color-black: #0a0a0a;
-  --color-gold: #d4af37;
-  --color-gold-dark: #b89626;
-  --color-silver: #c0c0c0;
+  --color-black: #000000;
+  --color-gold: #ffcc00; /* Yellow */
+  --color-gold-dark: #e6b800; /* Darker Yellow */
+  --color-silver: #cccccc;
   --color-white: #ffffff;
-  --color-warm-neutral: #fdfaf6;
+  --color-warm-neutral: #ffffff;
   
   /* UI Colors */
-  --color-background: var(--color-warm-neutral);
+  --color-background: var(--color-white);
   --color-surface: var(--color-white);
   --color-text-primary: var(--color-black);
   --color-text-secondary: #4b5563;
-  --color-text-muted: #9ca3af;
+  --color-text-muted: #6b7280;
   --color-border: #e5e7eb;
   
   /* Functional */
@@ -40,7 +40,7 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-gold: 0 4px 14px 0 rgba(212, 175, 55, 0.39);
+  --shadow-gold: 0 4px 14px 0 rgba(255, 204, 0, 0.39);
 
   /* Radii */
   --radius-sm: 0.25rem;

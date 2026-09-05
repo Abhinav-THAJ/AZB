@@ -34,7 +34,7 @@ export default function ProductCard({ id, name, price, originalPrice, imageFallb
           fallback={imageFallback}
           alt={name} 
           aspectRatio="1/1"
-          style={{ objectFit: 'contain', padding: 'var(--spacing-4)' }} 
+          style={{ objectFit: 'cover' }} 
           containerClassName="transition-transform duration-300 group-hover:scale-105"
         />
       </Link>

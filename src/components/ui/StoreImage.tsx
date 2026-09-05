@@ -19,6 +19,7 @@ export default function StoreImage({
   containerClassName = '',
   className = '',
   fill = true,
+  style,
   ...props
 }: StoreImageProps) {
   const [error, setError] = useState(false);
@@ -76,7 +77,7 @@ export default function StoreImage({
               alt={alt} 
               fill={fill}
               className={className}
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'cover', ...style }}
               {...props} 
             />
           ) : (
@@ -109,6 +110,7 @@ export default function StoreImage({
             style={{ 
               objectFit: 'cover',
               transition: 'opacity 0.3s ease-in-out',
+              ...style
             }}
             onLoad={() => setLoading(false)}
             onError={() => setError(true)}

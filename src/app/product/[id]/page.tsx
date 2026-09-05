@@ -54,7 +54,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
               fallback={product.fallback}
               alt={product.name}
               aspectRatio="1/1"
-              style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
               priority={true}
             />
           </div>
@@ -86,6 +86,11 @@ export default async function ProductPage({ params }: { params: { id: string } }
             )}
           </div>
 
+          {/* Add to Cart Interactive Component */}
+          <AddToCartForm product={product} />
+
+          <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2rem 0' }} />
+
           <p className="text-muted" style={{ fontSize: '1.125rem', marginBottom: '2rem', lineHeight: 1.6 }}>
             {product.description}
           </p>
@@ -104,12 +109,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', marginBottom: '2rem' }} />
 
-          {/* Add to Cart Interactive Component */}
-          <AddToCartForm product={product} />
-
           {/* Trust Badges */}
           <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.875rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem', fontSize: '0.875rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 <span>Secure Checkout with Stripe</span>
