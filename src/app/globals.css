@@ -164,6 +164,7 @@ img {
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
+.thumbnail-hover:hover { border-color: var(--color-gold) !important; }
 .gap-2 { gap: var(--spacing-2); }
 .gap-4 { gap: var(--spacing-4); }
 .gap-6 { gap: var(--spacing-6); }

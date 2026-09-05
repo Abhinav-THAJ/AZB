@@ -60,7 +60,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
           
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', backgroundColor: 'var(--color-surface)', cursor: 'pointer', transition: 'border-color var(--transition-fast)' }} onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-gold)'} onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}>
+              <div key={i} className="thumbnail-hover" style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', backgroundColor: 'var(--color-surface)', cursor: 'pointer', transition: 'border-color var(--transition-fast)' }}>
                 <StoreImage 
                   src={null}
                   fallback={product.fallback}
