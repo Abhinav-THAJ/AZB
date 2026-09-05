@@ -15,6 +15,7 @@ interface AddToCartFormProps {
 export default function AddToCartForm({ product }: AddToCartFormProps) {
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const setIsCartOpen = useCartStore((state) => state.setIsOpen);
 
   const handleDecrease = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -25,7 +26,6 @@ export default function AddToCartForm({ product }: AddToCartFormProps) {
   };
 
   const handleAddToCart = () => {
-    // Add the specific quantity to the cart
     for (let i = 0; i < quantity; i++) {
       addItem({
         id: product.id,
@@ -35,40 +35,51 @@ export default function AddToCartForm({ product }: AddToCartFormProps) {
       });
     }
   };
+  
+  const handleBuyNow = () => {
+    handleAddToCart();
+    setIsCartOpen(true);
+  };
 
   return (
-    <div className="flex flex-col gap-6 mt-auto">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: 'auto' }}>
       <div>
-        <label className="block text-sm font-medium mb-2">Quantity</label>
-        <div className="flex items-center" style={{ width: 'fit-content', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Quantity</label>
+        <div style={{ display: 'flex', alignItems: 'center', width: 'fit-content', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
           <button 
             onClick={handleDecrease}
-            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color var(--transition-fast)' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(128,128,128,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             -
           </button>
-          <div className="w-12 h-10 flex items-center justify-center font-medium border-x border-[var(--color-border)]">
+          <div style={{ width: '3rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, borderLeft: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)' }}>
             {quantity}
           </div>
           <button 
             onClick={handleIncrease}
-            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            style={{ width: '2.5rem', height: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color var(--transition-fast)' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(128,128,128,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             +
           </button>
         </div>
       </div>
 
-      <div className="flex gap-4 w-full">
+      <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
         <button 
           onClick={handleAddToCart}
-          className="btn btn-outline flex-1 py-3 text-lg"
+          className="btn btn-outline"
+          style={{ flex: 1, padding: '1rem', fontSize: '1.125rem' }}
         >
           Add to Cart
         </button>
         <button 
-          onClick={handleAddToCart}
-          className="btn btn-primary flex-1 py-3 text-lg bg-[var(--color-gold)] text-[var(--color-black)] hover:opacity-90 hover:shadow-lg transition-all"
+          onClick={handleBuyNow}
+          className="btn btn-primary"
+          style={{ flex: 1, padding: '1rem', fontSize: '1.125rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-black)' }}
         >
           Buy Now
         </button>
