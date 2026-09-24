@@ -20,7 +20,18 @@ export default function Header() {
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
 
-  // Update live search suggestions
+  // Sync searchQuery with URL on initial load if on /shop?q=...
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        setSearchQuery(q);
+      }
+    }
+  }, []);
+
+  // Update live search suggestions as user types
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       const results = searchProducts(searchQuery);
@@ -49,10 +60,13 @@ export default function Header() {
   }, []);
 
   const executeSearch = (queryToSearch: string) => {
-    if (queryToSearch.trim()) {
-      setIsSearchOpen(false);
-      setIsMobileMenuOpen(false);
-      router.push(`/shop?q=${encodeURIComponent(queryToSearch.trim())}`);
+    setIsSearchOpen(false);
+    setIsMobileMenuOpen(false);
+    const trimmed = queryToSearch.trim();
+    if (trimmed) {
+      router.push(`/shop?q=${encodeURIComponent(trimmed)}`);
+    } else {
+      router.push('/shop');
     }
   };
 
@@ -120,7 +134,7 @@ export default function Header() {
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden text-white p-1.5 -ml-1.5 hover:bg-white/10 rounded-lg transition-colors"
+              className="md:hidden text-white p-1.5 -ml-1.5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
               aria-label="Open navigation menu"
             >
               <Menu size={24} />
@@ -136,10 +150,16 @@ export default function Header() {
           </div>
 
           {/* Desktop Search */}
-          <div ref={desktopSearchRef} className="hidden md:flex flex-1 max-w-2xl mx-auto relative">
-            <form onSubmit={handleSearchSubmit} className="w-full bg-white rounded-full flex items-center p-1 shadow-sm">
+          <div ref={desktopSearchRef} className="hidden md:flex flex-1 max-w-2xl mx-auto relative z-50">
+            <form 
+              action="/shop" 
+              method="GET" 
+              onSubmit={handleSearchSubmit} 
+              className="w-full bg-white rounded-full flex items-center p-1 shadow-sm"
+            >
               <input 
                 type="text" 
+                name="q"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => { if (searchQuery.trim()) setIsSearchOpen(true); }}
@@ -149,16 +169,16 @@ export default function Header() {
               {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full"
-                  aria-label="Clear text"
+                  onClick={() => { setSearchQuery(''); setIsSearchOpen(false); }}
+                  className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full cursor-pointer"
+                  aria-label="Clear search"
                 >
                   <X size={16} />
                 </button>
               )}
               <button 
                 type="submit"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6 py-2 rounded-full transition-colors flex items-center gap-1.5 text-sm flex-shrink-0"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6 py-2 rounded-full transition-colors flex items-center gap-1.5 text-sm flex-shrink-0 cursor-pointer"
               >
                 <span>Search</span>
                 <Search size={16} strokeWidth={2.5} />
@@ -202,8 +222,9 @@ export default function Header() {
                       ))}
                     </div>
                     <button
+                      type="button"
                       onClick={() => executeSearch(searchQuery)}
-                      className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors border-t border-yellow-500/20"
+                      className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors border-t border-yellow-500/20 cursor-pointer"
                     >
                       <span>View all matching results for "{searchQuery}"</span>
                       <ArrowRight size={15} />
@@ -213,8 +234,9 @@ export default function Header() {
                   <div className="p-6 text-center">
                     <p className="text-sm text-gray-600">No products found matching "{searchQuery}"</p>
                     <button
+                      type="button"
                       onClick={() => executeSearch(searchQuery)}
-                      className="mt-2 text-xs font-semibold text-yellow-600 hover:underline"
+                      className="mt-2 text-xs font-semibold text-yellow-600 hover:underline cursor-pointer"
                     >
                       Search store anyway →
                     </button>
@@ -265,10 +287,16 @@ export default function Header() {
         </div>
 
         {/* Mobile Search Bar & Dropdown */}
-        <div ref={mobileSearchRef} className="md:hidden px-4 pb-3 pt-0.5 relative">
-          <form onSubmit={handleSearchSubmit} className="w-full bg-white rounded-full flex items-center p-1 shadow-sm">
+        <div ref={mobileSearchRef} className="md:hidden px-4 pb-3 pt-0.5 relative z-50">
+          <form 
+            action="/shop" 
+            method="GET" 
+            onSubmit={handleSearchSubmit} 
+            className="w-full bg-white rounded-full flex items-center p-1 shadow-sm"
+          >
             <input 
               type="text" 
+              name="q"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => { if (searchQuery.trim()) setIsSearchOpen(true); }}
@@ -278,16 +306,16 @@ export default function Header() {
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
-                className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full"
-                aria-label="Clear text"
+                onClick={() => { setSearchQuery(''); setIsSearchOpen(false); }}
+                className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full cursor-pointer"
+                aria-label="Clear search"
               >
                 <X size={14} />
               </button>
             )}
             <button 
               type="submit"
-              className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-1.5 rounded-full transition-colors flex items-center gap-1 text-xs flex-shrink-0"
+              className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-1.5 rounded-full transition-colors flex items-center gap-1 text-xs flex-shrink-0 cursor-pointer"
             >
               <span>Search</span>
               <Search size={14} strokeWidth={2.5} />
@@ -296,7 +324,7 @@ export default function Header() {
 
           {/* Mobile Live Suggestions Dropdown */}
           {isSearchOpen && (
-            <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+            <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in fade-in-50 duration-150">
               {searchResults.length > 0 ? (
                 <div>
                   <div className="p-2.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -330,8 +358,9 @@ export default function Header() {
                     ))}
                   </div>
                   <button
+                    type="button"
                     onClick={() => executeSearch(searchQuery)}
-                    className="w-full py-2.5 bg-yellow-400 text-black text-xs font-bold flex items-center justify-center gap-1.5 border-t border-yellow-500/20"
+                    className="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-bold flex items-center justify-center gap-1.5 border-t border-yellow-500/20 cursor-pointer"
                   >
                     <span>View all results for "{searchQuery}"</span>
                     <ArrowRight size={14} />
@@ -341,8 +370,9 @@ export default function Header() {
                 <div className="p-4 text-center">
                   <p className="text-xs text-gray-600">No products matching "{searchQuery}"</p>
                   <button
+                    type="button"
                     onClick={() => executeSearch(searchQuery)}
-                    className="mt-1 text-xs font-bold text-yellow-600"
+                    className="mt-1 text-xs font-bold text-yellow-600 cursor-pointer hover:underline"
                   >
                     Search store anyway →
                   </button>
@@ -382,7 +412,7 @@ export default function Header() {
           <div className="w-full md:w-auto flex items-center justify-between md:justify-end">
             <button 
               onClick={() => setIsLocationModalOpen(true)}
-              className="w-full md:w-auto bg-white rounded-full px-3.5 sm:px-4 py-1.5 flex items-center justify-between md:justify-start gap-2 text-xs sm:text-sm text-gray-600 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="w-full md:w-auto bg-white rounded-full px-3.5 sm:px-4 py-1.5 flex items-center justify-between md:justify-start gap-2 text-xs sm:text-sm text-gray-600 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <MapPin size={15} className="text-yellow-600 flex-shrink-0" fill="currentColor" />
@@ -421,7 +451,7 @@ export default function Header() {
               </Link>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-400 hover:text-white p-1 rounded-md"
+                className="text-gray-400 hover:text-white p-1 rounded-md cursor-pointer"
                 aria-label="Close menu"
               >
                 <X size={22} />
@@ -546,7 +576,7 @@ export default function Header() {
                     setIsMobileMenuOpen(false);
                     setIsLocationModalOpen(true);
                   }}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 text-left"
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5">
                     <MapPin size={18} className="text-yellow-600" />
@@ -586,7 +616,7 @@ export default function Header() {
               </h3>
               <button 
                 onClick={() => setIsLocationModalOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors p-1"
+                className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer"
                 aria-label="Close location modal"
               >
                 <X size={20} />
@@ -600,7 +630,7 @@ export default function Header() {
               <button 
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
-                className="w-full flex items-center justify-center gap-2 bg-yellow-50 text-yellow-800 hover:bg-yellow-100 font-semibold py-2.5 sm:py-3 rounded-xl mb-5 transition-colors border border-yellow-200 disabled:opacity-70 disabled:cursor-not-allowed text-xs sm:text-sm"
+                className="w-full flex items-center justify-center gap-2 bg-yellow-50 text-yellow-800 hover:bg-yellow-100 font-semibold py-2.5 sm:py-3 rounded-xl mb-5 transition-colors border border-yellow-200 disabled:opacity-70 disabled:cursor-not-allowed text-xs sm:text-sm cursor-pointer"
               >
                 <Navigation size={16} className={isDetecting ? "animate-pulse" : ""} />
                 {isDetecting ? "Detecting location..." : "Auto-detect my location"}
@@ -624,7 +654,7 @@ export default function Header() {
                 />
                 <button 
                   type="submit"
-                  className="bg-black text-white hover:bg-gray-800 font-semibold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-colors text-xs sm:text-sm flex-shrink-0"
+                  className="bg-black text-white hover:bg-gray-800 font-semibold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-colors text-xs sm:text-sm flex-shrink-0 cursor-pointer"
                 >
                   Apply
                 </button>
