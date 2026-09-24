@@ -98,28 +98,24 @@ export default function OutfitsForYou() {
     // Wait a brief moment for layout to complete
     setTimeout(() => {
       const setWidth = container.scrollWidth / 4;
-      // Start at the beginning of the second set
       container.scrollLeft = setWidth;
     }, 100);
 
     const handleScroll = () => {
       const setWidth = container.scrollWidth / 4;
-      // If scrolled deep into the first set, jump to the third set
       if (container.scrollLeft < setWidth / 2) {
         container.scrollLeft += setWidth * 2;
-      }
-      // If scrolled deep into the fourth set, jump to the second set
-      else if (container.scrollLeft > setWidth * 2.5) {
+      } else if (container.scrollLeft > setWidth * 2.5) {
         container.scrollLeft -= setWidth * 2;
       }
     };
 
     container.addEventListener('scroll', handleScroll);
     
-    // Auto scroll timer
     const timer = setInterval(() => {
       if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        const step = window.innerWidth < 640 ? 200 : 300;
+        scrollContainerRef.current.scrollBy({ left: step, behavior: 'smooth' });
       }
     }, 15000);
 
@@ -131,37 +127,39 @@ export default function OutfitsForYou() {
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+      const step = window.innerWidth < 640 ? 200 : 300;
+      scrollContainerRef.current.scrollBy({ left: -step, behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+      const step = window.innerWidth < 640 ? 200 : 300;
+      scrollContainerRef.current.scrollBy({ left: step, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="container mx-auto px-4 py-12">
+    <section className="container mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-wide">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 uppercase tracking-wide">
           OUTFITS FOR YOU
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button 
             onClick={scrollLeft}
-            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
             aria-label="Previous products"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={18} />
           </button>
           <button 
             onClick={scrollRight}
-            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
             aria-label="Next products"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={18} />
           </button>
         </div>
       </div>
@@ -169,43 +167,49 @@ export default function OutfitsForYou() {
       {/* Product Carousel */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+        className="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-3 sm:pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {displayProducts.map((product) => (
-          <div key={product.uniqueId} className="min-w-[280px] md:min-w-[calc(16.666%-20px)] flex-1 snap-start group flex flex-col">
+          <div 
+            key={product.uniqueId} 
+            className="min-w-[170px] sm:min-w-[210px] md:min-w-[230px] lg:min-w-[calc(16.666%-20px)] flex-1 snap-start group flex flex-col bg-white rounded-lg"
+          >
             {/* Image Box */}
-            <div className="relative aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden mb-3">
+            <div className="relative aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden mb-2 sm:mb-3">
               <img 
                 src={product.image} 
                 alt={product.title} 
-                className="w-full h-full object-cover mix-blend-multiply"
+                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
               />
-              <button className="absolute top-3 right-3 bg-white p-1.5 rounded shadow-sm text-gray-400 hover:text-red-500 transition-colors z-10">
-                <Heart size={18} />
+              <button 
+                className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs p-1.5 rounded shadow-sm text-gray-400 hover:text-red-500 transition-colors z-10"
+                aria-label="Add to wishlist"
+              >
+                <Heart size={16} />
               </button>
             </div>
             
             {/* Details */}
             <div className="flex flex-col flex-1">
-              <h3 className="font-bold text-sm text-gray-900 line-clamp-2 leading-snug min-h-[40px]">
+              <h3 className="font-bold text-xs sm:text-sm text-gray-900 line-clamp-2 leading-snug min-h-[32px] sm:min-h-[40px]">
                 {product.title}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">{product.category}</p>
+              <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">{product.category}</p>
               
-              <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-lg font-extrabold text-gray-900">₹{product.price}</span>
-                <span className="text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
-                <span className="text-sm font-bold text-red-500">({product.discount})</span>
+              <div className="mt-1 flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
+                <span className="text-base sm:text-lg font-extrabold text-gray-900">₹{product.price}</span>
+                <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
+                <span className="text-xs font-bold text-red-500">({product.discount})</span>
               </div>
               
-              <div className="mt-4 mt-auto">
+              <div className="mt-3 mt-auto">
                 {product.soldOut ? (
-                  <button className="bg-black text-white px-4 py-1.5 rounded text-xs font-bold cursor-not-allowed opacity-90">
+                  <button className="w-full bg-black text-white px-3 py-1.5 rounded text-xs font-bold cursor-not-allowed opacity-90">
                     Sold Out
                   </button>
                 ) : (
-                  <button className="bg-black text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition-colors">
+                  <button className="w-full bg-black text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition-colors">
                     Add to Cart
                   </button>
                 )}
@@ -216,8 +220,8 @@ export default function OutfitsForYou() {
       </div>
 
       {/* View All Button */}
-      <div className="flex justify-end mt-4">
-        <button className="px-6 py-2 border border-gray-300 rounded text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+      <div className="flex justify-end mt-2 sm:mt-4">
+        <button className="px-5 py-1.5 sm:px-6 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
           View All
         </button>
       </div>

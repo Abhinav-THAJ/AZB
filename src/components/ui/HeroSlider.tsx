@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
@@ -10,6 +10,8 @@ const slides = [
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,8 +28,33 @@ export default function HeroSlider() {
     setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    if (distance > 50) {
+      nextSlide();
+    } else if (distance < -50) {
+      prevSlide();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
-    <section className="relative w-full h-[300px] md:h-[480px] lg:h-[550px] overflow-hidden bg-gray-50">
+    <section 
+      className="relative w-full h-[180px] sm:h-[300px] md:h-[450px] lg:h-[520px] overflow-hidden bg-gray-100"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {slides.map((slide, index) => (
         <div 
           key={index}
@@ -37,7 +64,7 @@ export default function HeroSlider() {
         >
           <img 
             src={slide} 
-            alt={`Banner ${index + 1}`}
+            alt={`AZB Banner ${index + 1}`}
             className="w-full h-full object-cover object-center"
           />
         </div>
@@ -46,28 +73,28 @@ export default function HeroSlider() {
       {/* Navigation Arrows */}
       <button 
         onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-sm"
+        className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-black/30 hover:bg-black/50 md:bg-white/40 md:hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-sm"
         aria-label="Previous banner"
       >
-        <ChevronLeft size={28} />
+        <ChevronLeft className="w-5 h-5 md:w-7 md:h-7" />
       </button>
 
       <button 
         onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-sm"
+        className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-black/30 hover:bg-black/50 md:bg-white/40 md:hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-sm"
         aria-label="Next banner"
       >
-        <ChevronRight size={28} />
+        <ChevronRight className="w-5 h-5 md:w-7 md:h-7" />
       </button>
 
       {/* Pagination Dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+      <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2.5 z-20">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrent(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 shadow-sm ${
-              current === index ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white/90'
+            className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 shadow-sm ${
+              current === index ? 'w-5 sm:w-6 bg-yellow-400' : 'w-1.5 sm:w-2 bg-white/70 hover:bg-white'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
