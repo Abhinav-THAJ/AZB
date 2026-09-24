@@ -1,1 +1,6 @@
-export default function Page() { return <div className='container mx-auto px-4 py-32 text-center'><h1 className='text-4xl font-bold mb-4'>OUTFITS</h1><p className='text-gray-600'>This page is currently under construction.</p></div>; }
+import React from 'react';
+import { redirect } from 'next/navigation';
+
+export default function OutfitsPage() {
+  redirect('/shop?category=Outfits');
+}

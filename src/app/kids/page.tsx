@@ -1,1 +1,9 @@
-export default function Page() { return <div className='container mx-auto px-4 py-32 text-center'><h1 className='text-4xl font-bold mb-4'>KIDS</h1><p className='text-gray-600'>This page is currently under construction.</p></div>; }
+import React, { Suspense } from 'react';
+import ShopPage from '@/app/shop/page';
+
+// Reuse ShopPage pre-filtered to Kids or redirect to /shop?category=Kids
+import { redirect } from 'next/navigation';
+
+export default function KidsPage() {
+  redirect('/shop?category=Kids');
+}

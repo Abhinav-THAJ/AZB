@@ -1,15 +1,65 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, User, Heart, ShoppingCart, MapPin, Menu, X, Navigation, Phone, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, User, Heart, ShoppingCart, MapPin, Menu, X, Navigation, Phone, ChevronRight, ArrowRight } from 'lucide-react';
+import { searchProducts, Product } from '@/data/products';
 
 export default function Header() {
+  const router = useRouter();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location, setLocation] = useState('Select location');
   const [pinCode, setPinCode] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
+
+  // Search states
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+
+  // Update live search suggestions
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const results = searchProducts(searchQuery);
+      setSearchResults(results.slice(0, 5));
+      setIsSearchOpen(true);
+    } else {
+      setSearchResults([]);
+      setIsSearchOpen(false);
+    }
+  }, [searchQuery]);
+
+  // Click outside to dismiss search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        desktopSearchRef.current && 
+        !desktopSearchRef.current.contains(event.target as Node) &&
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const executeSearch = (queryToSearch: string) => {
+    if (queryToSearch.trim()) {
+      setIsSearchOpen(false);
+      setIsMobileMenuOpen(false);
+      router.push(`/shop?q=${encodeURIComponent(queryToSearch.trim())}`);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    executeSearch(searchQuery);
+  };
 
   const handleLocationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +91,7 @@ export default function Header() {
             setIsLocationModalOpen(false);
           } catch (error) {
             console.error('Error detecting location:', error);
-            setLocation('Delivering to 110001'); // Fallback
+            setLocation('Delivering to 110001');
             setIsLocationModalOpen(false);
           } finally {
             setIsDetecting(false);
@@ -57,14 +107,6 @@ export default function Header() {
     } else {
       alert('Geolocation is not supported by your browser.');
       setIsDetecting(false);
-    }
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // In a real app or with routing, push to search results
-      console.log('Searching for:', searchQuery);
     }
   };
 
@@ -94,23 +136,92 @@ export default function Header() {
           </div>
 
           {/* Desktop Search */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-auto">
+          <div ref={desktopSearchRef} className="hidden md:flex flex-1 max-w-2xl mx-auto relative">
             <form onSubmit={handleSearchSubmit} className="w-full bg-white rounded-full flex items-center p-1 shadow-sm">
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for products..." 
-                className="w-full bg-transparent border-none py-2 px-5 text-gray-700 focus:outline-none text-sm placeholder-gray-400"
+                onFocus={() => { if (searchQuery.trim()) setIsSearchOpen(true); }}
+                placeholder="Search for toys, outfits, markers, books..." 
+                className="w-full bg-transparent border-none py-2 px-5 text-gray-800 focus:outline-none text-sm placeholder-gray-400"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full"
+                  aria-label="Clear text"
+                >
+                  <X size={16} />
+                </button>
+              )}
               <button 
                 type="submit"
-                className="bg-yellow-500 text-black font-semibold px-6 py-2 rounded-full hover:bg-yellow-400 transition-colors flex items-center gap-1.5 text-sm flex-shrink-0"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6 py-2 rounded-full transition-colors flex items-center gap-1.5 text-sm flex-shrink-0"
               >
                 <span>Search</span>
                 <Search size={16} strokeWidth={2.5} />
               </button>
             </form>
+
+            {/* Desktop Live Suggestions Dropdown */}
+            {isSearchOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in fade-in-50 duration-150">
+                {searchResults.length > 0 ? (
+                  <div>
+                    <div className="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Suggested Products
+                      </span>
+                      <span className="text-xs text-yellow-600 font-medium">
+                        Press Enter to view all
+                      </span>
+                    </div>
+                    <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+                      {searchResults.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => executeSearch(item.title)}
+                          className="p-3 hover:bg-yellow-50/50 flex items-center gap-3 cursor-pointer transition-colors"
+                        >
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-yellow-600 font-semibold truncate">{item.category}</p>
+                            <h4 className="text-sm font-bold text-gray-900 truncate">{item.title}</h4>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-sm font-extrabold text-gray-900">₹{item.price}</span>
+                              <span className="text-xs text-gray-400 line-through">₹{item.originalPrice}</span>
+                              <span className="text-[11px] font-bold text-red-500">{item.discount}</span>
+                            </div>
+                          </div>
+                          <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => executeSearch(searchQuery)}
+                      className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors border-t border-yellow-500/20"
+                    >
+                      <span>View all matching results for "{searchQuery}"</span>
+                      <ArrowRight size={15} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-6 text-center">
+                    <p className="text-sm text-gray-600">No products found matching "{searchQuery}"</p>
+                    <button
+                      onClick={() => executeSearch(searchQuery)}
+                      className="mt-2 text-xs font-semibold text-yellow-600 hover:underline"
+                    >
+                      Search store anyway →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* User Actions */}
@@ -118,7 +229,7 @@ export default function Header() {
             {/* Login Link */}
             <Link 
               href="/login" 
-              className="hidden sm:flex items-center gap-1.5 text-white hover:text-white/80 transition-colors font-medium text-xs md:text-sm"
+              className="hidden sm:flex items-center gap-1.5 text-white hover:text-yellow-400 transition-colors font-medium text-xs md:text-sm"
             >
               <User size={18} fill="currentColor" />
               <span>Login</span>
@@ -129,7 +240,7 @@ export default function Header() {
             {/* Wishlist Link */}
             <Link 
               href="/wishlist" 
-              className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors font-medium text-xs md:text-sm p-1.5 sm:p-0"
+              className="flex items-center gap-1.5 text-white hover:text-yellow-400 transition-colors font-medium text-xs md:text-sm p-1.5 sm:p-0"
               aria-label="Wishlist"
             >
               <Heart size={20} className="sm:w-[18px] sm:h-[18px]" fill="currentColor" />
@@ -141,7 +252,7 @@ export default function Header() {
             {/* Cart Link */}
             <Link 
               href="/cart" 
-              className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors font-medium text-xs md:text-sm relative p-1.5 sm:p-0 pr-2"
+              className="flex items-center gap-1.5 text-white hover:text-yellow-400 transition-colors font-medium text-xs md:text-sm relative p-1.5 sm:p-0 pr-2"
               aria-label="Cart"
             >
               <ShoppingCart size={20} className="sm:w-[18px] sm:h-[18px]" fill="currentColor" />
@@ -153,24 +264,92 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Search Bar - Visible on Small Screens */}
-        <div className="md:hidden px-4 pb-3 pt-0.5">
+        {/* Mobile Search Bar & Dropdown */}
+        <div ref={mobileSearchRef} className="md:hidden px-4 pb-3 pt-0.5 relative">
           <form onSubmit={handleSearchSubmit} className="w-full bg-white rounded-full flex items-center p-1 shadow-sm">
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for products, outfits, toys..." 
-              className="w-full bg-transparent border-none py-1.5 px-4 text-gray-700 focus:outline-none text-xs sm:text-sm placeholder-gray-400"
+              onFocus={() => { if (searchQuery.trim()) setIsSearchOpen(true); }}
+              placeholder="Search toys, outfits, markers, books..." 
+              className="w-full bg-transparent border-none py-1.5 px-4 text-gray-800 focus:outline-none text-xs sm:text-sm placeholder-gray-400"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full"
+                aria-label="Clear text"
+              >
+                <X size={14} />
+              </button>
+            )}
             <button 
               type="submit"
-              className="bg-yellow-500 text-black font-semibold px-4 py-1.5 rounded-full hover:bg-yellow-400 transition-colors flex items-center gap-1 text-xs flex-shrink-0"
+              className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-1.5 rounded-full transition-colors flex items-center gap-1 text-xs flex-shrink-0"
             >
               <span>Search</span>
               <Search size={14} strokeWidth={2.5} />
             </button>
           </form>
+
+          {/* Mobile Live Suggestions Dropdown */}
+          {isSearchOpen && (
+            <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+              {searchResults.length > 0 ? (
+                <div>
+                  <div className="p-2.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                      Suggestions
+                    </span>
+                    <span className="text-[11px] text-yellow-600 font-medium">
+                      Tap to open
+                    </span>
+                  </div>
+                  <div className="divide-y divide-gray-100 max-h-64 overflow-y-auto">
+                    {searchResults.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => executeSearch(item.title)}
+                        className="p-2.5 hover:bg-yellow-50/50 flex items-center gap-3 cursor-pointer"
+                      >
+                        <div className="w-10 h-10 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 border border-gray-200">
+                          <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold text-gray-900 truncate">{item.title}</h4>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-xs font-extrabold text-gray-900">₹{item.price}</span>
+                            <span className="text-[10px] text-gray-400 line-through">₹{item.originalPrice}</span>
+                            <span className="text-[10px] font-bold text-red-500">{item.discount}</span>
+                          </div>
+                        </div>
+                        <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => executeSearch(searchQuery)}
+                    className="w-full py-2.5 bg-yellow-400 text-black text-xs font-bold flex items-center justify-center gap-1.5 border-t border-yellow-500/20"
+                  >
+                    <span>View all results for "{searchQuery}"</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              ) : (
+                <div className="p-4 text-center">
+                  <p className="text-xs text-gray-600">No products matching "{searchQuery}"</p>
+                  <button
+                    onClick={() => executeSearch(searchQuery)}
+                    className="mt-1 text-xs font-bold text-yellow-600"
+                  >
+                    Search store anyway →
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -189,6 +368,9 @@ export default function Header() {
               </li>
               <li>
                 <Link href="/outfits" className="text-gray-700 hover:text-yellow-600 transition-colors font-semibold text-sm">Outfits</Link>
+              </li>
+              <li>
+                <Link href="/shop" className="text-gray-700 hover:text-yellow-600 transition-colors font-semibold text-sm">All Products</Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-700 hover:text-yellow-600 transition-colors font-semibold text-sm">Contact</Link>
@@ -278,6 +460,14 @@ export default function Header() {
                   <ChevronRight size={16} className="text-gray-400" />
                 </Link>
                 <Link 
+                  href="/shop" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-100"
+                >
+                  <span>All Products</span>
+                  <ChevronRight size={16} className="text-gray-400" />
+                </Link>
+                <Link 
                   href="/kids" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-100"
@@ -294,7 +484,7 @@ export default function Header() {
                   <ChevronRight size={16} className="text-gray-400" />
                 </Link>
                 <Link 
-                  href="/category/personalized-gifts" 
+                  href="/shop?category=Personalized+Gifts" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-100"
                 >
@@ -302,7 +492,7 @@ export default function Header() {
                   <ChevronRight size={16} className="text-gray-400" />
                 </Link>
                 <Link 
-                  href="/category/psc-books" 
+                  href="/shop?category=Books" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-100"
                 >
@@ -310,7 +500,7 @@ export default function Header() {
                   <ChevronRight size={16} className="text-gray-400" />
                 </Link>
                 <Link 
-                  href="/category/electronics" 
+                  href="/shop?category=Electronics" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-100"
                 >
