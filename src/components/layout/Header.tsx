@@ -1,12 +1,15 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, User, Heart, ShoppingCart, MapPin, Menu, X, Navigation, Phone, ChevronRight, ArrowRight } from 'lucide-react';
 import { searchProducts, Product } from '@/data/products';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Header() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { totalItems } = useCart();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location, setLocation] = useState('Select location');
@@ -20,16 +23,14 @@ export default function Header() {
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
 
-  // Sync searchQuery with URL on initial load if on /shop?q=...
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get('q');
-      if (q) {
-        setSearchQuery(q);
-      }
+    const q = searchParams.get('q');
+    if (q) {
+      setSearchQuery(q);
+    } else {
+      setSearchQuery('');
     }
-  }, []);
+  }, [searchParams]);
 
   // Update live search suggestions as user types
   useEffect(() => {
@@ -125,7 +126,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full relative z-40">
+    <header className="w-full sticky top-0 z-40 shadow-md">
       {/* Top Row: Logo, Search, User actions */}
       <div className="bg-black">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6">
@@ -152,8 +153,6 @@ export default function Header() {
           {/* Desktop Search */}
           <div ref={desktopSearchRef} className="hidden md:flex flex-1 max-w-2xl mx-auto relative z-50">
             <form 
-              action="/shop" 
-              method="GET" 
               onSubmit={handleSearchSubmit} 
               className="w-full bg-white rounded-full flex items-center p-1 shadow-sm"
             >
@@ -280,7 +279,7 @@ export default function Header() {
               <ShoppingCart size={20} className="sm:w-[18px] sm:h-[18px]" fill="currentColor" />
               <span className="hidden md:inline">Cart</span>
               <span className="absolute -top-1 sm:-top-2 -right-0.5 sm:-right-1 bg-yellow-500 text-black font-bold text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-                0
+                {totalItems}
               </span>
             </Link>
           </div>
@@ -289,8 +288,6 @@ export default function Header() {
         {/* Mobile Search Bar & Dropdown */}
         <div ref={mobileSearchRef} className="md:hidden px-4 pb-3 pt-0.5 relative z-50">
           <form 
-            action="/shop" 
-            method="GET" 
             onSubmit={handleSearchSubmit} 
             className="w-full bg-white rounded-full flex items-center p-1 shadow-sm"
           >
@@ -569,7 +566,7 @@ export default function Header() {
                     <ShoppingCart size={18} className="text-gray-500" />
                     <span>My Cart</span>
                   </div>
-                  <span className="bg-yellow-500 text-black font-bold text-xs rounded-full px-2 py-0.5">0</span>
+                  <span className="bg-yellow-500 text-black font-bold text-xs rounded-full px-2 py-0.5">{totalItems}</span>
                 </Link>
                 <button 
                   onClick={() => {

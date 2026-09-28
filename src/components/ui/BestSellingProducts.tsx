@@ -1,6 +1,9 @@
 'use client';
 import React, { useRef, useEffect } from 'react';
 import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { Product } from '@/data/products';
 
 const products = [
   {
@@ -107,6 +110,8 @@ const products = [
 
 export default function BestSellingProducts() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   // Duplicate products to create 4 identical sets for the infinite loop illusion
   const displayProducts = [...products, ...products, ...products, ...products].map((p, i) => ({ ...p, uniqueId: i }));
@@ -193,7 +198,7 @@ export default function BestSellingProducts() {
         {displayProducts.map((product) => (
           <div 
             key={product.uniqueId} 
-            className="min-w-[170px] sm:min-w-[210px] md:min-w-[230px] lg:min-w-[calc(16.666%-20px)] flex-1 snap-start group flex flex-col bg-white rounded-lg"
+            className="w-[calc(50%-6px)] sm:w-[calc(33.333%-10.66px)] md:w-[calc(25%-18px)] lg:w-[calc(16.666%-20px)] flex-none snap-start group flex flex-col bg-white rounded-lg"
           >
             {/* Image Box */}
             <div className="relative aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden mb-2 sm:mb-3">
@@ -203,10 +208,13 @@ export default function BestSellingProducts() {
                 className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
               />
               <button 
-                className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs p-1.5 rounded shadow-sm text-gray-400 hover:text-red-500 transition-colors z-10"
+                onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product as unknown as Product)}
+                className={`absolute top-2 right-2 backdrop-blur-xs p-1.5 rounded shadow-sm transition-colors z-10 ${
+                  isInWishlist(product.id) ? 'bg-red-50 text-red-500' : 'bg-white/90 text-gray-400 hover:text-red-500'
+                }`}
                 aria-label="Add to wishlist"
               >
-                <Heart size={16} />
+                <Heart size={16} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
               </button>
             </div>
             
@@ -229,7 +237,10 @@ export default function BestSellingProducts() {
                     Sold Out
                   </button>
                 ) : (
-                  <button className="w-full bg-black text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition-colors">
+                  <button 
+                    onClick={() => addToCart(product as unknown as Product)}
+                    className="w-full bg-black text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition-colors cursor-pointer"
+                  >
                     Add to Cart
                   </button>
                 )}

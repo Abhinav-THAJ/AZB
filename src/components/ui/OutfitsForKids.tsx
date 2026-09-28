@@ -173,7 +173,7 @@ export default function OutfitsForKids() {
         {displayProducts.map((product) => (
           <div 
             key={product.uniqueId} 
-            className="min-w-[170px] sm:min-w-[210px] md:min-w-[230px] lg:min-w-[calc(16.666%-20px)] flex-1 snap-start group flex flex-col bg-white rounded-lg"
+            className="w-[calc(50%-6px)] sm:w-[calc(33.333%-10.66px)] md:w-[calc(25%-18px)] lg:w-[calc(16.666%-20px)] flex-none snap-start group flex flex-col bg-white rounded-lg"
           >
             {/* Image Box */}
             <div className="relative aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden mb-2 sm:mb-3">

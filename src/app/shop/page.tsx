@@ -5,11 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, Heart, SlidersHorizontal, ArrowUpDown, X, Tag } from 'lucide-react';
 import { allProducts, Product } from '@/data/products';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 function ShopContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || 'All';
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -174,10 +178,13 @@ function ShopContent() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
                   />
                   <button 
-                    className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs p-1.5 rounded-full text-gray-400 hover:text-red-500 transition-colors shadow-xs"
+                    onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
+                    className={`absolute top-2 right-2 backdrop-blur-xs p-1.5 rounded-full transition-colors shadow-xs ${
+                      isInWishlist(product.id) ? 'bg-red-50 text-red-500' : 'bg-white/90 text-gray-400 hover:text-red-500'
+                    }`}
                     aria-label="Add to wishlist"
                   >
-                    <Heart size={15} />
+                    <Heart size={15} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
                   </button>
                   {product.discount && (
                     <span className="absolute bottom-2 left-2 bg-yellow-400 text-black font-extrabold text-[10px] px-2 py-0.5 rounded-md shadow-xs">
@@ -210,7 +217,8 @@ function ShopContent() {
                       </button>
                     ) : (
                       <button 
-                        className="w-full bg-black text-white hover:bg-yellow-500 hover:text-black transition-colors py-1.5 rounded-lg text-xs font-bold"
+                        onClick={() => addToCart(product)}
+                        className="w-full bg-black text-white hover:bg-yellow-500 hover:text-black transition-colors py-1.5 rounded-lg text-xs font-bold cursor-pointer"
                       >
                         Add to Cart
                       </button>
