@@ -5,6 +5,7 @@ import PromoRibbon from "@/components/layout/PromoRibbon";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Providers } from "@/contexts/Providers";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,9 +35,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <PromoRibbon />
-          <React.Suspense fallback={<div className="h-16 bg-black"></div>}>
+          <Suspense fallback={<div className="h-16 bg-black"></div>}>
             <Header />
-          </React.Suspense>
+          </Suspense>
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
