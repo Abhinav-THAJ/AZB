@@ -34,7 +34,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <PromoRibbon />
-          <Header />
+          <React.Suspense fallback={<div className="h-16 bg-black"></div>}>
+            <Header />
+          </React.Suspense>
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
